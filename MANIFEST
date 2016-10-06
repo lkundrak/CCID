@@ -40,7 +40,7 @@ src/Makefile.am
 src/parse.c
 src/parser.h
 src/pcscdefines.h
-src/reader.conf.in
+src/reader.conf.d/libccidtwin.in
 src/tokenparser.c
 src/tokenparser.l
 src/utils.c

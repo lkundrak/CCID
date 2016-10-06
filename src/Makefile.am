@@ -70,7 +70,8 @@ parse_SOURCES = parse.c debug.c ccid_usb.c $(TOKEN_PARSER)
 parse_LDADD = $(LIBUSB_LIBS)
 parse_CFLAGS = $(PCSC_CFLAGS) $(LIBUSB_CFLAGS) -DSIMCLIST_NO_DUMPRESTORE
 
-EXTRA_DIST = Info.plist.src create_Info_plist.pl reader.conf.in \
+EXTRA_DIST = Info.plist.src create_Info_plist.pl \
+	reader.conf.d/libccidtwin.in \
 	towitoko/COPYING towitoko/README openct/LICENSE openct/README \
 	convert_version.pl 92_pcscd_ccid.rules
 
@@ -95,7 +96,7 @@ install_ccidtwin: libccidtwin.la
 	$(mkinstalldirs) $(DESTDIR)$(ccidtwindir)
 	cp .libs/$(CCIDTWIN_LIB) $(DESTDIR)$(ccidtwindir)/$(CCIDTWIN_LIB)
 	$(mkinstalldirs) $(DESTDIR)/$(serialconfdir) ; \
-		perl -ne "s|TARGET|$(ccidtwindir)/$(CCIDTWIN_LIB)| ; print" $(srcdir)/reader.conf.in > $(DESTDIR)/$(serialconfdir)/libccidtwin
+		perl -ne "s|TARGET|$(ccidtwindir)/$(CCIDTWIN_LIB)| ; print" $(srcdir)/reader.conf.d/libccidtwin.in > $(DESTDIR)/$(serialconfdir)/libccidtwin
 
 # do not uninstall the serial driver by default
 # use explicitely 'make uninstall_ccidtwin'
