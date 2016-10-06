@@ -67,6 +67,15 @@ src/libccid_la-simclist.lo
 src/libccid_la-strlcpy.lo
 src/libccid_la-tokenparser.lo
 src/libccid_la-utils.lo
+src/libccidpcmcia.la
+src/libccidpcmcia_la-ccid.lo
+src/libccidpcmcia_la-ccid_pcmcia.lo
+src/libccidpcmcia_la-commands.lo
+src/libccidpcmcia_la-ifdhandler.lo
+src/libccidpcmcia_la-simclist.lo
+src/libccidpcmcia_la-strlcpy.lo
+src/libccidpcmcia_la-tokenparser.lo
+src/libccidpcmcia_la-utils.lo
 src/libccidtwin.la
 src/libccidtwin_la-atr.lo
 src/libccidtwin_la-buffer.lo
@@ -87,6 +96,9 @@ src/openct/.libs/
 src/openct/libccid_la-buffer.lo
 src/openct/libccid_la-checksum.lo
 src/openct/libccid_la-proto-t1.lo
+src/openct/libccidpcmcia_la-buffer.lo
+src/openct/libccidpcmcia_la-checksum.lo
+src/openct/libccidpcmcia_la-proto-t1.lo
 src/openct/libccidtwin_la-buffer.lo
 src/openct/libccidtwin_la-checksum.lo
 src/openct/libccidtwin_la-proto-t1.lo
@@ -104,6 +116,8 @@ src/towitoko/.dirstamp
 src/towitoko/.libs/
 src/towitoko/libccid_la-atr.lo
 src/towitoko/libccid_la-pps.lo
+src/towitoko/libccidpcmcia_la-atr.lo
+src/towitoko/libccidpcmcia_la-pps.lo
 src/towitoko/libccidtwin_la-atr.lo
 src/towitoko/libccidtwin_la-pps.lo
 stamp-h1

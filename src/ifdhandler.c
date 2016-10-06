@@ -294,7 +294,7 @@ EXTERNAL RESPONSECODE IFDHCloseChannel(DWORD Lun)
 } /* IFDHCloseChannel */
 
 
-#if !defined(TWIN_SERIAL)
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 static RESPONSECODE IFDHPolling(DWORD Lun, int timeout)
 {
 	int reader_index;
@@ -519,7 +519,7 @@ EXTERNAL RESPONSECODE IFDHGetCapabilities(DWORD Lun, DWORD Tag,
 				*(uint32_t *)Value = get_ccid_descriptor(reader_index) -> dwMaxCCIDMessageLength -10;
 			break;
 
-#if !defined(TWIN_SERIAL)
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 		case TAG_IFD_POLLING_THREAD_WITH_TIMEOUT:
 			{
 				_ccid_descriptor *ccid_desc;

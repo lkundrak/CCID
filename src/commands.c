@@ -108,7 +108,7 @@ RESPONSECODE CmdPowerOn(unsigned int reader_index, unsigned int * nlength,
 	RESPONSECODE return_value = IFD_SUCCESS;
 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
 
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 	if (PROTOCOL_ICCD_A == ccid_descriptor->bInterfaceProtocol)
 	{
 		int r;
@@ -1035,7 +1035,7 @@ RESPONSECODE CmdPowerOff(unsigned int reader_index)
 	RESPONSECODE return_value = IFD_SUCCESS;
 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
 
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 	if (PROTOCOL_ICCD_A == ccid_descriptor->bInterfaceProtocol)
 	{
 		int r;
@@ -1124,7 +1124,7 @@ RESPONSECODE CmdGetSlotStatus(unsigned int reader_index, unsigned char buffer[])
 	RESPONSECODE return_value = IFD_SUCCESS;
 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
 
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 	if (PROTOCOL_ICCD_A == ccid_descriptor->bInterfaceProtocol)
 	{
 		int r;
@@ -1305,7 +1305,7 @@ RESPONSECODE CCID_Transmit(unsigned int reader_index, unsigned int tx_length,
 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
 	status_t ret;
 
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 	if (PROTOCOL_ICCD_A == ccid_descriptor->bInterfaceProtocol)
 	{
 		int r;
@@ -1380,7 +1380,7 @@ RESPONSECODE CCID_Receive(unsigned int reader_index, unsigned int *rx_length,
 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
 	unsigned int old_timeout;
 
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 	if (PROTOCOL_ICCD_A == ccid_descriptor->bInterfaceProtocol)
 	{
 		unsigned char pcbuffer[SIZE_GET_SLOT_STATUS];

@@ -86,7 +86,7 @@ int ccid_open_hack_pre(unsigned int reader_index)
 	if ((PROTOCOL_CCID == ccid_descriptor->bInterfaceProtocol)
 		&& (3 == ccid_descriptor -> bNumEndpoints))
 	{
-#ifndef TWIN_SERIAL
+#if !defined(TWIN_SERIAL) && !defined(PCMCIA)
 		/* just wait for 100ms in case a notification is in the pipe */
 		(void)InterruptRead(reader_index, 100);
 #endif

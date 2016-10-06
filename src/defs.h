@@ -99,6 +99,16 @@ typedef enum {
 #include "ccid_serial.h"
 
 #else
+#ifdef PCMCIA
+
+#define OpenPortByName OpenPCMCIAByName
+#define OpenPort OpenPCMCIA
+#define ClosePort ClosePCMCIA
+#define ReadPort ReadPCMCIA
+#define WritePort WritePCMCIA
+#include "ccid_pcmcia.h"
+
+#else
 
 #define OpenPortByName OpenUSBByName
 #define OpenPort OpenUSB
@@ -107,5 +117,6 @@ typedef enum {
 #define WritePort WriteUSB
 #include "ccid_usb.h"
 
+#endif
 #endif
 

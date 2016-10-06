@@ -204,6 +204,21 @@ if test "${ccidtwindir}" = false ; then
 	ccidtwindir=$usbdropdir/serial
 fi
 
+# --enable-pcmcia
+AC_ARG_ENABLE(pcmcia,
+	AS_HELP_STRING([--enable-pcmcia],[also compile and install the PCMCIA driver]),
+	[pcmcia="${enableval}"], [pcmcia=no])
+AM_CONDITIONAL(WITH_PCMCIA, test "${pcmcia}" != "no")
+
+# --enable-ccidpcmciadir=DIR
+AC_ARG_ENABLE(ccidpcmciadir,
+	AS_HELP_STRING([--enable-ccidpcmciadir=DIR],[directory to install the
+	PCMCIA driver (default to pcscd config or $(prefix)/pcsc/drivers/pcmcia)]),
+	[ccidpcmciadir="${enableval}"], [ccidpcmciadir=false])
+if test "${ccidpcmciadir}" = false ; then
+	ccidpcmciadir=$usbdropdir/pcmcia
+fi
+
 # --enable-serialconfdir=DIR
 AC_ARG_ENABLE(serialconfdir,
 	AS_HELP_STRING([--enable-serialconfdir=dir],[directory containing
@@ -270,6 +285,7 @@ AC_SUBST(ac_aux_dir)
 AC_SUBST(bundle)
 AC_SUBST(usbdropdir)
 AC_SUBST(ccidtwindir)
+AC_SUBST(ccidpcmciadir)
 AC_SUBST(serialconfdir)
 AS_AC_EXPAND(bindir_exp,$bindir)
 AS_AC_EXPAND(sysconfdir_exp,$sysconfdir)
@@ -309,6 +325,7 @@ bundle directory name:   ${bundle}
 USB drop directory:      ${usbdropdir}
 serial Twin support:     ${twinserial}
 serial twin install dir: ${ccidtwindir}
+PCMCIA support:          ${pcmcia}
 serial config directory: ${serialconfdir}
 compiled for pcsc-lite:  ${pcsclite}
 syslog debug:            ${use_syslog}

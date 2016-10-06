@@ -1,0 +1,6 @@
+# PCMCIA reader
+#  - n is the device name to use n in [0..7]
+# example: /dev/scr24x0
+#DEVICENAME        /dev/scr24xn
+#FRIENDLYNAME      "PCMCIA"
+#LIBPATH           TARGET

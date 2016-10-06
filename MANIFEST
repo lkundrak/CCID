@@ -41,6 +41,7 @@ src/parse.c
 src/parser.h
 src/pcscdefines.h
 src/reader.conf.d/libccidtwin.in
+src/reader.conf.d/libccidpcmcia.in
 src/tokenparser.c
 src/tokenparser.l
 src/utils.c

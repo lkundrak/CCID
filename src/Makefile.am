@@ -1,6 +1,7 @@
 CCID_BUNDLE = $(bundle)
 CCID_LIB = libccid.$(DYN_LIB_EXT)
 CCIDTWIN_LIB = libccidtwin.$(DYN_LIB_EXT)
+CCIDPCMCIA_LIB = libccidpcmcia.$(DYN_LIB_EXT)
 
 CCID_VERSION=CCID_VERSION=`$(srcdir)/convert_version.pl $(PACKAGE_VERSION)`
 
@@ -18,6 +19,11 @@ lib_LTLIBRARIES += libccidtwin.la
 LIBS_TO_INSTALL += install_ccidtwin
 LIBS_TO_UNINSTALL += uninstall_ccidtwin
 endif
+if WITH_PCMCIA
+lib_LTLIBRARIES += libccidpcmcia.la
+LIBS_TO_INSTALL += install_ccidpcmcia
+LIBS_TO_UNINSTALL += uninstall_ccidpcmcia
+endif
 
 COMMON = ccid.c \
 	ccid.h \
@@ -31,6 +37,7 @@ COMMON = ccid.c \
 	utils.h
 USB = ccid_usb.c ccid_usb.h
 SERIAL = ccid_serial.c ccid_serial.h
+PCMCIA = ccid_pcmcia.c ccid_pcmcia.h
 T1 = towitoko/atr.c \
 	towitoko/atr.h \
 	towitoko/defines.h \
@@ -66,12 +73,19 @@ libccidtwin_la_CFLAGS = $(PCSC_CFLAGS) $(PTHREAD_CFLAGS) $(SYMBOL_VISIBILITY) \
 libccidtwin_la_LIBADD = $(PTHREAD_LIBS)
 libccidtwin_la_LDFLAGS = -avoid-version
 
+libccidpcmcia_la_SOURCES = $(COMMON) $(PCMCIA) $(TOKEN_PARSER) \
+	$(PROVIDED_BY_PCSC) $(T1)
+libccidpcmcia_la_CFLAGS = $(PCSC_CFLAGS) $(PTHREAD_CFLAGS) $(SYMBOL_VISIBILITY) \
+	-DPCMCIA -D$(CCID_VERSION) -DSIMCLIST_NO_DUMPRESTORE
+libccidpcmcia_la_LIBADD = $(PTHREAD_LIBS)
+libccidpcmcia_la_LDFLAGS = -avoid-version
+
 parse_SOURCES = parse.c debug.c ccid_usb.c $(TOKEN_PARSER)
 parse_LDADD = $(LIBUSB_LIBS)
 parse_CFLAGS = $(PCSC_CFLAGS) $(LIBUSB_CFLAGS) -DSIMCLIST_NO_DUMPRESTORE
 
 EXTRA_DIST = Info.plist.src create_Info_plist.pl \
-	reader.conf.d/libccidtwin.in \
+	reader.conf.d/libccidtwin.in reader.conf.d/libccidpcmcia.in \
 	towitoko/COPYING towitoko/README openct/LICENSE openct/README \
 	convert_version.pl 92_pcscd_ccid.rules
 
@@ -98,6 +112,12 @@ install_ccidtwin: libccidtwin.la
 	$(mkinstalldirs) $(DESTDIR)/$(serialconfdir) ; \
 		perl -ne "s|TARGET|$(ccidtwindir)/$(CCIDTWIN_LIB)| ; print" $(srcdir)/reader.conf.d/libccidtwin.in > $(DESTDIR)/$(serialconfdir)/libccidtwin
 
+install_ccidpcmcia: libccidpcmcia.la
+	$(mkinstalldirs) $(DESTDIR)$(ccidpcmciadir)
+	cp .libs/$(CCIDPCMCIA_LIB) $(DESTDIR)$(ccidpcmciadir)/$(CCIDPCMCIA_LIB)
+	$(mkinstalldirs) $(DESTDIR)/$(serialconfdir) ; \
+		perl -ne "s|TARGET|$(ccidpcmciadir)/$(CCIDPCMCIA_LIB)| ; print" $(srcdir)/reader.conf.d/libccidpcmcia.in > $(DESTDIR)/$(serialconfdir)/libccidpcmcia
+
 # do not uninstall the serial driver by default
 # use explicitely 'make uninstall_ccidtwin'
 uninstall: $(LIBS_TO_UNINSTALL)
@@ -109,3 +129,6 @@ uninstall_ccidtwin:
 	rm -f $(DESTDIR)$(ccidtwindir)/$(CCIDTWIN_LIB)
 	rm -f $(DESTDIR)/$(serialconfdir)/libccidtwin
 
+uninstall_ccidpcmcia:
+	rm -f $(DESTDIR)$(ccidpcmciadir)/$(CCIDPCMCIA_LIB)
+	rm -f $(DESTDIR)/$(serialconfdir)/libccidpcmcia
