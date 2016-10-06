@@ -21,6 +21,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include <config.h>
 #include "defs.h"
@@ -32,24 +35,83 @@ static struct {
 	int fd;
 	unsigned char seq;
 	_ccid_descriptor ccid;
+	char *dev_name;
 } readers[CCID_DRIVER_MAX_READERS];
 
 #define THIS readers[reader_index]
 
+static status_t status_from_errno()
+{
+	switch (errno)
+	{
+		case 0:
+			return STATUS_SUCCESS;
+		case EIO:
+			return STATUS_COMM_ERROR;
+		case ENOENT:
+		case ENODEV:
+			return STATUS_NO_SUCH_DEVICE;
+		default:
+			return STATUS_UNSUCCESSFUL;
+	}
+}
+
+/* We close the underlying device file as soon as we detect an error, so
+ * that kernel has a chance to release resources associated with the file
+ * descriptor in case the device was removed. We also attempt to re-open
+ * the device to increase robustness in case of transient errors. */
+
+static int
+open_device(unsigned int reader_index)
+{
+	if (!THIS.dev_name) {
+		errno = EINVAL;
+		return -1;
+	}
+	if (THIS.fd <= 0)
+		THIS.fd = open(THIS.dev_name, O_RDWR);
+	return THIS.fd;
+}
+
+static void
+close_device(unsigned int reader_index)
+{
+	close(THIS.fd);
+	THIS.fd = -1;
+}
+
 status_t WritePCMCIA(unsigned int reader_index, unsigned int length, unsigned char *buffer)
 {
-	if (write(THIS.fd, buffer, length) != length)
-		return STATUS_UNSUCCESSFUL;
+	int ret;
+
+	if (open_device(reader_index) == -1)
+		return status_from_errno();
+
+	ret = write(THIS.fd, buffer, length);
+	if (ret == -1) {
+		close_device(reader_index);
+		return status_from_errno();
+	}
+	if (ret != length)
+		return STATUS_DEVICE_PROTOCOL_ERROR;
 
 	return STATUS_SUCCESS;
 }
 
 status_t ReadPCMCIA(unsigned int reader_index, unsigned int *length, unsigned char *buffer)
 {
-	*length = read(THIS.fd, buffer, *length);
-	if (*length == -1)
-		return STATUS_UNSUCCESSFUL;
+	int ret;
 
+	if (open_device(reader_index) == -1)
+		return status_from_errno();
+
+	ret = read(THIS.fd, buffer, *length);
+	if (ret == -1) {
+		close_device(reader_index);
+		return status_from_errno();
+	}
+
+	*length = ret;
 	return STATUS_SUCCESS;
 }
 
@@ -63,10 +125,9 @@ status_t OpenPCMCIAByName(unsigned int reader_index, char *dev_name)
 	if (THIS.fd > 0)
 		return STATUS_UNSUCCESSFUL;
 
-	THIS.fd = open(dev_name, O_RDWR);
-	if (THIS.fd == -1)
+	THIS.dev_name = strdup(dev_name);
+	if (!THIS.dev_name)
 		return STATUS_UNSUCCESSFUL;
-
 	THIS.seq = 0;
 	THIS.ccid.pbSeq = &THIS.seq;
 	THIS.ccid.dwMaxCCIDMessageLength = 271;
@@ -74,16 +135,21 @@ status_t OpenPCMCIAByName(unsigned int reader_index, char *dev_name)
 	THIS.ccid.dwFeatures = CCID_CLASS_TPDU;
 	THIS.ccid.bVoltageSupport = 7;
 
+	if (open_device(reader_index) == -1)
+		return status_from_errno();
+
 	return STATUS_SUCCESS;
 }
 
 status_t ClosePCMCIA(unsigned int reader_index)
 {
-	if (THIS.fd <= 0)
+	if (!THIS.dev_name)
 		return STATUS_UNSUCCESSFUL;
 
-	close(THIS.fd);
-	THIS.fd = 0;
+	free(THIS.dev_name);
+	THIS.dev_name = NULL;
+
+	close_device(reader_index);
 	return STATUS_SUCCESS;
 }
 
