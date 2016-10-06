@@ -1348,6 +1348,9 @@ RESPONSECODE CCID_Transmit(unsigned int reader_index, unsigned int tx_length,
 	}
 #endif
 
+	if ((SCR24X == ccid_descriptor->readerID) && (0 == rx_length))
+		rx_length = 1;
+
 	cmd[0] = 0x6F; /* XfrBlock */
 	i2dw(tx_length, cmd+1);	/* APDU length */
 	cmd[5] = ccid_descriptor->bCurrentSlotIndex;	/* slot number */

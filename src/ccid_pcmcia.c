@@ -117,7 +117,12 @@ status_t ReadPCMCIA(unsigned int reader_index, unsigned int *length, unsigned ch
 
 status_t OpenPCMCIA(unsigned int reader_index, int channel)
 {
-	return STATUS_UNSUCCESSFUL;
+	char actual_name[sizeof("/dev/scr24xXX")];
+
+	if (snprintf(actual_name, sizeof(actual_name), "/dev/scr24x%d", channel) >= sizeof(actual_name))
+		return STATUS_UNSUCCESSFUL;
+
+	return OpenPCMCIAByName(reader_index, actual_name);
 }
 
 status_t OpenPCMCIAByName(unsigned int reader_index, char *dev_name)
@@ -134,6 +139,9 @@ status_t OpenPCMCIAByName(unsigned int reader_index, char *dev_name)
 	THIS.ccid.dwMaxIFSD = 254;
 	THIS.ccid.dwFeatures = CCID_CLASS_TPDU;
 	THIS.ccid.bVoltageSupport = 7;
+
+	if (strstr(dev_name, "scr24x"))
+		THIS.ccid.readerID = SCR24X;
 
 	if (open_device(reader_index) == -1)
 		return status_from_errno();
